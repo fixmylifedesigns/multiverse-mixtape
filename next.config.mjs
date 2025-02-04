@@ -1,7 +1,27 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["localhost"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images-api.printify.com",
+        pathname: "/mockup/**",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "3000",
+        pathname: "/images/**",
+      },
+    ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/images/:path*",
+        destination: "/public/images/:path*",
+      },
+    ];
   },
 };
 
