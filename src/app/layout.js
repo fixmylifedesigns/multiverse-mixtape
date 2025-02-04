@@ -1,5 +1,5 @@
 import localFont from "next/font/local";
-import "./globals.css";
+import Header from "@/components/nav";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -13,8 +13,44 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "Multiverse Mixtape",
-  description: "New City Pop",
+  metadataBase: new URL("https://multiversemixtape.com"),
+  title: {
+    default: "MultiverseMixtape | New Wave Music Culture",
+    template: "%s | MultiverseMixtape",
+  },
+  description:
+    "Explore the MultiverseMixtape collection inspired by New Wave and City Pop culture. Shop our curated selection of music-inspired fashion and merchandise.",
+  keywords: [
+    "new wave",
+    "city pop",
+    "music fashion",
+    "retro clothing",
+    "japanese culture",
+  ],
+  openGraph: {
+    title: "MultiverseMixtape",
+    description: "New Wave Music Culture & Fashion",
+    url: "https://multiversemixtape.com",
+    siteName: "MultiverseMixtape",
+    locale: "en_US",
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "MultiverseMixtape",
+    description: "New Wave Music Culture & Fashion",
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -23,17 +59,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <header className="header">
-          <div className="logo">CPT</div>
-          <h1>The Multiverse Mixtape</h1>
-          <p>Music, Fashion, and Nostalgia</p>
-          <nav className="nav">
-            <a href="#about">About</a>
-            <a href="#artists">Artists</a>
-            <a href="#playlist">Playlist</a>
-            {/* <a href="#shop">Shop</a> */}
-          </nav>
-        </header>
+        <Header />
         {children}
       </body>
     </html>

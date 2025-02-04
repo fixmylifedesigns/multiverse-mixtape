@@ -1,12 +1,24 @@
 "use client";
-
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 
 export default function Home() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if there's a hash in the URL
+    if (window.location.hash) {
+      const element = document.querySelector(window.location.hash);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  }, []);
+
   return (
     <div>
       <main className={styles.container}>
-
         {/* Multiverse Mixtape - Our Music */}
         <section className={styles.content} id="our-music">
           <h2>Our Music: The Multiverse Mixtape Sound</h2>
@@ -79,9 +91,10 @@ export default function Home() {
             retro-inspired jackets, and accessories that capture the neon-lit
             nostalgia of Tokyo nights.
           </p>
-          <p>
+          Shop Coming Soon
+          {/* <p>
             <a href="#">Visit our shop</a> to explore our latest collection!
-          </p>
+          </p> */}
         </section>
       </main>
 
