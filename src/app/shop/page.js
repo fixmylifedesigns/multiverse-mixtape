@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function Shop() {
   const [products, setProducts] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchProducts() {
@@ -33,7 +35,8 @@ export default function Shop() {
           products.map((product) => (
             <div
               key={product.id}
-              className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:-translate-y-2"
+              className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:-translate-y-2 cursor-pointer"
+              onClick={() => router.push(`/shop/${product.id}`)}
             >
               <div className="relative h-64 w-full">
                 <Image
@@ -49,14 +52,26 @@ export default function Shop() {
                 <p className="text-lg font-medium text-gray-700 mb-4">
                   ${product.variants[0].price / 100}
                 </p>
-                <a
-                  href={product.external}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full text-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200"
-                >
-                  Buy Now
-                </a>
+                <div className="flex gap-2">
+                  <button
+                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/shop/${product.id}`);
+                    }}
+                  >
+                    View Details
+                  </button>
+                  <a
+                    href={product.external}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 text-center bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors duration-200"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Buy Now
+                  </a>
+                </div>
               </div>
             </div>
           ))

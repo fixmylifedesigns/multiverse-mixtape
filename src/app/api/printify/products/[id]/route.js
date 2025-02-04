@@ -8,7 +8,7 @@ export async function GET(request, { params }) {
       `https://api.printify.com/v1/shops/${process.env.PRINTIFY_SHOP_ID}/products/${id}.json`,
       {
         headers: {
-          Authorization: `Bearer ${process.env.PRINTIFY_API_TOKEN}`,
+          Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
         },
       }
     );
