@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import styles from "./shop.module.css";
+// import styles from "./shop.module.css";
 import Image from "next/image";
 
 export default function Shop() {
