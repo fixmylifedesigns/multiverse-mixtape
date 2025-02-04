@@ -1,0 +1,119 @@
+/* app/page.module.css */
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  background-color: var(--primary-color);
+  padding: 20px;
+  text-align: center;
+  border-bottom: 4px solid #ff8c00;
+  position: relative;
+}
+
+.logo {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.header h1 {
+  font-size: 3em;
+  margin-bottom: 10px;
+  color: #ffffff;
+  text-shadow: 3px 3px #ff8c00;
+}
+
+.nav {
+  margin-top: 20px;
+}
+
+.nav a {
+  color: #ffffff;
+  text-decoration: none;
+  margin: 0 10px;
+  font-weight: bold;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  font-size: 1.2em;
+}
+
+.nav a:hover,
+.nav a:focus {
+  background-color: var(--secondary-color);
+  outline: 2px solid #ffffff;
+}
+
+/* different */
+
+.content {
+  background-color: #ffffff;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border: 2px solid #ff8c00;
+}
+
+.artistList {
+  list-style-type: none;
+  padding: 0;
+}
+
+.artistList li {
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: var(--secondary-color);
+  border-radius: 5px;
+  color: #ffffff;
+  font-size: 1.2em;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px;
+  background-color: var(--primary-color);
+  color: #ffffff;
+  border-top: 4px solid #ff8c00;
+}
+
+.content a {
+  color: var(--link-color);
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.content a:hover,
+.content a:focus {
+  color: var(--link-hover-color);
+  outline: 2px solid var(--link-hover-color);
+}
+
+.content h2 {
+  color: #ff4500;
+  font-size: 2em;
+  border-bottom: 2px dashed #ff8c00;
+  padding-bottom: 5px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 10px;
+  }
+  .header h1 {
+    font-size: 2.5em;
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "songs": [
+    {
+      "id": "1",
+      "title": "Midnight Reflectionsss",
+      "artist": "Sakan Miyuki",
+      "year": "1981",
+      "style": "City Pop, Jazz Fusion, Japanese",
+      "story": "A nostalgic journey through late-night Tokyo, blending jazz and pop elements.",
+      "country": "Japan",
+      "imageUrl": "/images/beautifuldays.jpg",
+      "mp3Url": "https://example.com/audio/midnight-reflections.mp3",
+      "videoUrl": "https://example.com/videos/midnight-reflections.mp4",
+      "screenshotUrl": "https://example.com/screenshots/midnight-reflections.jpg",
+      "lyrics_structure": [
+        {
+          "No.": 1,
+          "type": "intro",
+          "content": "[Instrumental Beat: Soft drums with electric piano]"
+        },
+        {
+          "No.": 2,
+          "type": "verse",
+          "content": "夜の街を歩くたび\n心の中に響いている\nあの日の光、もう戻らない\nあなたの笑顔、まだここにある"
+        },
+        {
+          "No.": 3,
+          "type": "chorus",
+          "content": "Remember the Midnight Days\n二度と戻らないの\n星の光、遠い記憶\nあなたを連れていった"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "title": "Neon Dreams",
+      "artist": "Synthwave Collective",
+      "year": "2019",
+      "style": "Synthwave, Electronic",
+      "story": "An homage to 80s electronic music, capturing the essence of retro-futurism.",
+      "country": "United States",
+      "imageUrl": "/images/beautifuldays.jpg",
+      "mp3Url": "https://example.com/audio/neon-dreams.mp3",
+      "videoUrl": "https://example.com/videos/neon-dreams.mp4",
+      "screenshotUrl": "https://example.com/screenshots/neon-dreams.jpg",
+      "lyrics_structure": [
+        {
+          "No.": 1,
+          "type": "intro",
+          "content": "[Synth arpeggio with pulsing bass]"
+        },
+        {
+          "No.": 2,
+          "type": "verse",
+          "content": "Neon lights flicker in the rain\nDigital dreams, we're not the same\nCybernetic heart, electric soul\nVirtual love takes its toll"
+        },
+        {
+          "No.": 3,
+          "type": "chorus",
+          "content": "In my neon dreams\nNothing's as it seems\nPixelated love, binary code\nIn this digital world, we call home"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "title": "Samba de Verão",
+      "artist": "João Gilberto",
+      "year": "1964",
+      "style": "Bossa Nova, Brazilian Jazz",
+      "story": "A classic bossa nova tune celebrating the joy of Brazilian summers.",
+      "country": "Brazil",
+      "imageUrl": "/images/beautifuldays.jpg",
+      "mp3Url": "https://example.com/audio/samba-de-verao.mp3",
+      "videoUrl": "https://example.com/videos/samba-de-verao.mp4",
+      "screenshotUrl": "https://example.com/screenshots/samba-de-verao.jpg",
+      "lyrics_structure": [
+        {
+          "No.": 1,
+          "type": "intro",
+          "content": "[Gentle guitar strumming with soft percussion]"
+        },
+        {
+          "No.": 2,
+          "type": "verse",
+          "content": "Samba de verão\nJá cantei pra você\nMas esse ano\nMeu cantar se fez mais triste"
+        },
+        {
+          "No.": 3,
+          "type": "chorus",
+          "content": "Porque passou\nE a gente não viu\nO amor que a gente queria\nO amor que a gente queria"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "title": "Digital Sunset",
+      "artist": "Vapor Wave",
+      "year": "2022",
+      "style": "Vaporwave, Ambient",
+      "story": "An exploration of digital nostalgia and the aesthetics of early internet culture.",
+      "country": "United Kingdom",
+      "imageUrl": "/images/beautifuldays.jpg",
+      "mp3Url": "https://example.com/audio/digital-sunset.mp3",
+      "videoUrl": "https://example.com/videos/digital-sunset.mp4",
+      "screenshotUrl": "https://example.com/screenshots/digital-sunset.jpg",
+      "lyrics_structure": [
+        {
+          "No.": 1,
+          "type": "intro",
+          "content": "[Slowed down 80s pop sample with reverb]"
+        },
+        {
+          "No.": 2,
+          "type": "verse",
+          "content": "Pixelated memories fade\nIn the glow of a CRT shade\nWindows 95, a digital dream\nNothing is quite as it seems"
+        },
+        {
+          "No.": 3,
+          "type": "chorus",
+          "content": "Digital sunset, fading away\nNostalgia for a bygone day\nVaporwave aesthetics, mall music dreams\nEchoes of the past in lo-fi streams"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "title": "Sakura Nights",
+      "artist": "Tokyo Drift",
+      "year": "2020",
+      "style": "J-Pop, Electronic",
+      "story": "A modern take on Japanese pop, blending traditional elements with electronic beats.",
+      "country": "Japan",
+      "imageUrl": "/images/beautifuldays.jpg",
+      "mp3Url": "https://example.com/audio/sakura-nights.mp3",
+      "videoUrl": "https://example.com/videos/sakura-nights.mp4",
+      "screenshotUrl": "https://example.com/screenshots/sakura-nights.jpg",
+      "lyrics_structure": [
+        {
+          "No.": 1,
+          "type": "intro",
+          "content": "[Electronic beat with traditional Japanese flute]"
+        },
+        {
+          "No.": 2,
+          "type": "verse",
+          "content": "桜の花びらが舞う夜に\n君と歩いた街角\nネオンサインが輝いて\n私たちを包み込む"
+        },
+        {
+          "No.": 3,
+          "type": "chorus",
+          "content": "Sakura Nights, 心躍る\n東京の夜に溶け込んで\nSakura Nights, 君と二人\n終わらない夢を見てる"
+        }
+      ]
+    }
+  ]
+}

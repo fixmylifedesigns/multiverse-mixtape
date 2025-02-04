@@ -1,0 +1,13 @@
+/* src/styles/SongList.module.css */
+.songList {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .songList {
+    grid-template-columns: 1fr;
+  }
+}
