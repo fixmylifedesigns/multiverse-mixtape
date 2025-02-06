@@ -8,6 +8,11 @@ const nextConfig = {
         pathname: "/mockup/**",
       },
       {
+        protocol: "https",
+        hostname: "images.printify.com",
+        pathname: "/mockup/**",
+      },
+      {
         protocol: "http",
         hostname: "localhost",
         port: "3000",

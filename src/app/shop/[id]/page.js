@@ -39,6 +39,7 @@ export default function ProductPage({ params }) {
     fetchProduct();
   }, [params.id]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleVariantChange = () => {
     const newVariant = product.variants.find(
       (v) =>
@@ -50,12 +51,14 @@ export default function ProductPage({ params }) {
 
   useEffect(() => {
     if (selectedColor && selectedSize) handleVariantChange();
-  }, [selectedColor, selectedSize]);
+  }, [handleVariantChange, selectedColor, selectedSize]);
 
   if (loading)
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <p className="col-span-full text-center text-lg text-gray-600">
+          Loading product...
+        </p>
       </div>
     );
   if (!product)
@@ -113,14 +116,10 @@ export default function ProductPage({ params }) {
 
         <div className="flex flex-col space-y-6">
           <h1 className="text-3xl font-bold">{product.title}</h1>
+
           <div className="text-xl font-medium text-gray-900">
             ${selectedVariant?.price / 100}
           </div>
-
-          <div
-            className="prose prose-sm"
-            dangerouslySetInnerHTML={{ __html: product.description }}
-          />
 
           <div className="space-y-4">
             <div>
@@ -166,6 +165,10 @@ export default function ProductPage({ params }) {
               Buy Now - ${selectedVariant.price / 100}
             </button>
           )}
+          <div
+            className="prose prose-sm"
+            dangerouslySetInnerHTML={{ __html: product.description }}
+          />
         </div>
       </div>
     </div>
