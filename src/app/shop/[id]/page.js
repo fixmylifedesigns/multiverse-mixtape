@@ -4,14 +4,15 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useCart } from "@/context/CartContext";
 
 export default function ProductPage({ params }) {
   const [product, setProduct] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [selectedColor, setSelectedColor] = useState("");
-  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedOptions, setSelectedOptions] = useState({});
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     async function fetchProduct() {
@@ -20,15 +21,20 @@ export default function ProductPage({ params }) {
         if (!response.ok) throw new Error("Failed to fetch product");
         const data = await response.json();
         setProduct(data);
-        setSelectedVariant(data.variants[0]);
 
-        // Set initial color and size if available
-        const colorOptions = data.options.find((opt) => opt.name === "Colors");
-        const sizeOptions = data.options.find((opt) => opt.name === "Sizes");
-        if (colorOptions?.values.length)
-          setSelectedColor(colorOptions.values[0].id);
-        if (sizeOptions?.values.length)
-          setSelectedSize(sizeOptions.values[0].id);
+        // Initialize selected options with default values
+        const initialOptions = {};
+        data.options.forEach((option) => {
+          initialOptions[option.name] = option.values[0]?.id;
+        });
+        setSelectedOptions(initialOptions);
+
+        // Find the matching variant
+        const defaultVariant = findMatchingVariant(
+          data.variants,
+          Object.values(initialOptions)
+        );
+        setSelectedVariant(defaultVariant || data.variants[0]);
 
         setLoading(false);
       } catch (error) {
@@ -39,34 +45,57 @@ export default function ProductPage({ params }) {
     fetchProduct();
   }, [params.id]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleVariantChange = () => {
-    const newVariant = product.variants.find(
-      (v) =>
-        v.options.includes(parseInt(selectedColor)) &&
-        v.options.includes(parseInt(selectedSize))
+  const findMatchingVariant = (variants, selectedOptionIds) => {
+    return variants.find((variant) =>
+      selectedOptionIds.every((optionId) =>
+        variant.options.includes(parseInt(optionId))
+      )
     );
-    setSelectedVariant(newVariant || product.variants[0]);
   };
 
-  useEffect(() => {
-    if (selectedColor && selectedSize) handleVariantChange();
-  }, [handleVariantChange, selectedColor, selectedSize]);
+  const handleOptionChange = (optionName, optionId) => {
+    const newOptions = { ...selectedOptions, [optionName]: optionId };
+    setSelectedOptions(newOptions);
 
-  if (loading)
+    // Find matching variant based on selected options
+    if (product) {
+      const matchingVariant = findMatchingVariant(
+        product.variants,
+        Object.values(newOptions)
+      );
+      setSelectedVariant(matchingVariant || product.variants[0]);
+    }
+  };
+
+  const handleAddToCart = () => {
+    if (product && selectedVariant) {
+      const optionsData = {};
+      product.options.forEach((option) => {
+        const selectedValue = option.values.find(
+          (v) => v.id === parseInt(selectedOptions[option.name])
+        );
+        optionsData[option.name] = selectedValue.title;
+      });
+
+      addToCart(product, selectedVariant.id, optionsData);
+    }
+  };
+
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="col-span-full text-center text-lg text-gray-600">
-          Loading product...
-        </p>
+        <p className="text-lg text-gray-600">Loading product...</p>
       </div>
     );
-  if (!product)
+  }
+
+  if (!product) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        Product not found
+        <p className="text-lg text-gray-600">Product not found</p>
       </div>
     );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -79,6 +108,7 @@ export default function ProductPage({ params }) {
       </Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Product Images Section */}
         <div className="space-y-4">
           <div className="relative h-96 md:h-[600px] rounded-lg overflow-hidden">
             {product.images?.[currentImageIndex]?.src && (
@@ -114,6 +144,7 @@ export default function ProductPage({ params }) {
           </div>
         </div>
 
+        {/* Product Details Section */}
         <div className="flex flex-col space-y-6">
           <h1 className="text-3xl font-bold">{product.title}</h1>
 
@@ -121,54 +152,106 @@ export default function ProductPage({ params }) {
             ${selectedVariant?.price / 100}
           </div>
 
+          {/* Product Options */}
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Color</label>
-              <select
-                className="w-full border-gray-300 rounded-md shadow-sm"
-                value={selectedColor}
-                onChange={(e) => setSelectedColor(e.target.value)}
-              >
-                {product.options
-                  .find((opt) => opt.name === "Colors")
-                  ?.values.map((color) => (
-                    <option key={color.id} value={color.id}>
-                      {color.title}
+            {product.options.map((option) => (
+              <div key={option.name}>
+                <label className="block text-sm font-medium mb-2">
+                  {option.name}
+                </label>
+                <select
+                  className="w-full border-gray-300 rounded-md shadow-sm p-2"
+                  value={selectedOptions[option.name]}
+                  onChange={(e) =>
+                    handleOptionChange(option.name, e.target.value)
+                  }
+                >
+                  {option.values.map((value) => (
+                    <option key={value.id} value={value.id}>
+                      {value.title}
                     </option>
                   ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Size</label>
-              <select
-                className="w-full border-gray-300 rounded-md shadow-sm"
-                value={selectedSize}
-                onChange={(e) => setSelectedSize(e.target.value)}
-              >
-                {product.options
-                  .find((opt) => opt.name === "Sizes")
-                  ?.values.map((size) => (
-                    <option key={size.id} value={size.id}>
-                      {size.title}
-                    </option>
-                  ))}
-              </select>
-            </div>
+                </select>
+              </div>
+            ))}
           </div>
 
-          {selectedVariant && (
-            <button
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200"
-              onClick={() => window.open(product.external, "_blank")}
-            >
-              Buy Now - ${selectedVariant.price / 100}
-            </button>
-          )}
+          {/* Add to Cart Button */}
+          <button
+            className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition-colors duration-200"
+            onClick={handleAddToCart}
+            disabled={!selectedVariant?.is_available}
+          >
+            {selectedVariant?.is_available ? "Add to Cart" : "Out of Stock"}
+          </button>
+
+          {/* Product Description */}
           <div
-            className="prose prose-sm"
+            className="prose prose-sm mt-4"
             dangerouslySetInnerHTML={{ __html: product.description }}
           />
+
+          {/* Product Details */}
+          {selectedVariant && (
+            <div className="border-t pt-4 mt-4 space-y-2">
+              <h2 className="text-lg font-semibold">Product Details</h2>
+              <p className="text-sm text-gray-600">
+                <span className="font-medium">SKU:</span> {selectedVariant.sku}
+              </p>
+              <p className="text-sm text-gray-600">
+                <span className="font-medium">Weight:</span>{" "}
+                {selectedVariant.grams}g
+              </p>
+              {selectedVariant.quantity < 10 && (
+                <p className="text-sm text-red-600 mt-2">
+                  Only {selectedVariant.quantity} left in stock!
+                </p>
+              )}
+              <div className="mt-4">
+                <h3 className="text-sm font-medium mb-2">Selected Options:</h3>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  {product.options.map((option) => {
+                    const selectedValue = option.values.find(
+                      (v) => v.id === parseInt(selectedOptions[option.name])
+                    );
+                    return (
+                      <li key={option.name}>
+                        <span className="font-medium">{option.name}:</span>{" "}
+                        {selectedValue?.title}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+              {/* Print on Demand Details */}
+              <div className="mt-4">
+                <h3 className="text-sm font-medium mb-2">
+                  Print on Demand Details:
+                </h3>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  <li>
+                    <span className="font-medium">Blueprint ID:</span>{" "}
+                    {product.blueprint_id}
+                  </li>
+                  <li>
+                    <span className="font-medium">Variant ID:</span>{" "}
+                    {selectedVariant.id}
+                  </li>
+                </ul>
+              </div>
+              {/* Shipping & Production Info */}
+              <div className="mt-4">
+                <h3 className="text-sm font-medium mb-2">
+                  Shipping & Production:
+                </h3>
+                <ul className="text-sm text-gray-600 list-disc pl-4 space-y-1">
+                  <li>Production time: 2-5 business days</li>
+                  <li>Shipping time varies by location</li>
+                  <li>Printed and shipped from our trusted print providers</li>
+                </ul>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

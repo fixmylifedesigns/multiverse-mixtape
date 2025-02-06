@@ -1,5 +1,9 @@
+// src/app/layout.js
 import localFont from "next/font/local";
+import Script from "next/script";
 import Header from "@/components/nav";
+import { CartProvider } from "@/context/CartContext";
+import Cart from "@/components/Cart";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -59,8 +63,12 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Header />
-        {children}
+        <Script src="https://js.stripe.com/v3/" strategy="beforeInteractive" />
+        <CartProvider>
+          <Header />
+          <Cart />
+          {children}
+        </CartProvider>
       </body>
     </html>
   );

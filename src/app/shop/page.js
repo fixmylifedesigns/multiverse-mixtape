@@ -62,15 +62,6 @@ export default function Shop() {
                   >
                     View Details
                   </button>
-                  <a
-                    href={product.external}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1 text-center bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors duration-200"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    Buy Now
-                  </a>
                 </div>
               </div>
             </div>
