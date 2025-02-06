@@ -1,18 +1,34 @@
+// src/app/success/page.js
 import { CheckCircle, Package, Mail } from "lucide-react";
 import Link from "next/link";
+import { headers } from "next/headers";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 async function getOrderData(sessionId) {
   try {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_URL}/api/checkout/session?session_id=${sessionId}`,
-      { cache: "no-store" } // Ensures fresh data on every request
-    );
+    // Retrieve the checkout session directly from Stripe
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ["line_items", "customer", "payment_intent"],
+    });
 
-    if (!response.ok) throw new Error("Failed to fetch order details");
-
-    return await response.json();
+    return {
+      orderNumber: session.payment_intent.id,
+      orderDate: new Date(session.created * 1000).toLocaleDateString(),
+      orderAmount: session.amount_total,
+      customer: {
+        email: session.customer_details.email,
+        name: session.customer_details.name,
+      },
+      items: session.line_items.data.map((item) => ({
+        name: item.description,
+        quantity: item.quantity,
+        price: item.amount_total / 100,
+      })),
+    };
   } catch (error) {
-    console.error("Error fetching order data:", error.message);
+    console.error("Error fetching order data:", error);
     return null;
   }
 }
@@ -102,5 +118,5 @@ export default async function SuccessPage({ searchParams }) {
   );
 }
 
-export const runtime = "nodejs"; // Ensures it runs on the server
-export const dynamic = "force-dynamic"; // Forces dynamic rendering
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";

@@ -1,7 +1,7 @@
 // src/app/layout.js
 import localFont from "next/font/local";
 import Script from "next/script";
-import Header from "@/components/nav";
+import Header from "@/components/Header";
 import { CartProvider } from "@/context/CartContext";
 import Cart from "@/components/Cart";
 
