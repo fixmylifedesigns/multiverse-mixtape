@@ -1,15 +1,15 @@
+// src/app/api/webhook/route.js
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-// Email transporter setup
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_APP_PASSWORD, // Use App Password from Google Account
+    pass: process.env.EMAIL_APP_PASSWORD,
   },
 });
 
@@ -40,47 +40,93 @@ export const POST = async (request) => {
         price: (item.amount_total / 100).toFixed(2),
       }));
 
-      // Send confirmation email
       await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: checkoutSession.customer_details.email,
         subject: "Order Confirmation - Multiverse Mixtape",
         html: `
-          <h1>Thank you for your order!</h1>
-          <p>Order Number: ${session.payment_intent}</p>
-          <p>Order Date: ${new Date(
-            session.created * 1000
-          ).toLocaleDateString()}</p>
-          
-          <h2>Order Details:</h2>
-          <ul>
-            ${items
-              .map(
-                (item) => `
-              <li>${item.name} x ${item.quantity} - $${item.price}</li>
-            `
-              )
-              .join("")}
-          </ul>
-          
-          <p>Total: $${(checkoutSession.amount_total / 100).toFixed(2)}</p>
-          
-          <h2>Shipping Details:</h2>
-          <p>${checkoutSession.shipping_details.name}</p>
-          <p>${checkoutSession.shipping.address.line1}</p>
-          ${
-            checkoutSession.shipping.address.line2
-              ? `<p>${checkoutSession.shipping.address.line2}</p>`
-              : ""
-          }
-          <p>${checkoutSession.shipping.address.city}, ${
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto; line-height: 1.6; }
+                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                .header { background: #611f69; color: white; padding: 20px; border-radius: 4px 4px 0 0; text-align: center; }
+                .content { background: #ffffff; padding: 20px; border: 1px solid #e1e1e1; }
+                .order-info { background: #f8f8f8; padding: 15px; border-radius: 4px; margin: 15px 0; }
+                .item { border-bottom: 1px solid #e1e1e1; padding: 10px 0; }
+                .total { font-weight: bold; padding: 15px 0; border-top: 2px solid #e1e1e1; }
+                .shipping { background: #f0f7ff; padding: 15px; border-radius: 4px; margin: 15px 0; }
+                .footer { text-align: center; padding: 20px; color: #666; font-size: 0.9em; }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+                <div class="header">
+                  <h1 style="margin:0;">Order Confirmed! 🎉</h1>
+                </div>
+                
+                <div class="content">
+                  <p>Hey ${checkoutSession.customer_details.name},</p>
+                  <p>Thanks for shopping with Multiverse Mixtape! We're getting your order ready to be shipped.</p>
+                  
+                  <div class="order-info">
+                    <h2 style="margin-top:0;">Order Details</h2>
+                    <p><strong>Order Number:</strong> ${
+                      session.payment_intent
+                    }</p>
+                    <p><strong>Order Date:</strong> ${new Date(
+                      session.created * 1000
+                    ).toLocaleDateString()}</p>
+                    
+                    ${items
+                      .map(
+                        (item) => `
+                      <div class="item">
+                        <p style="margin:0;">
+                          <strong>${item.name}</strong><br>
+                          Quantity: ${item.quantity}<br>
+                          Price: $${item.price}
+                        </p>
+                      </div>
+                    `
+                      )
+                      .join("")}
+                    
+                    <div class="total">
+                      <p style="margin:0;">Total: $${(
+                        checkoutSession.amount_total / 100
+                      ).toFixed(2)}</p>
+                    </div>
+                  </div>
+                  
+                  <div class="shipping">
+                    <h2 style="margin-top:0;">Shipping Information</h2>
+                    <p style="margin:0;">
+                      ${checkoutSession.shipping_details.name}<br>
+                      ${checkoutSession.shipping.address.line1}<br>
+                      ${
+                        checkoutSession.shipping.address.line2
+                          ? `${checkoutSession.shipping.address.line2}<br>`
+                          : ""
+                      }
+                      ${checkoutSession.shipping.address.city}, ${
           checkoutSession.shipping.address.state
-        } ${checkoutSession.shipping.address.postal_code}</p>
-          <p>${checkoutSession.shipping.address.country}</p>
-          
-          <p>We'll send you another email when your order ships!</p>
-          
-          <p>Best regards,<br>Multiverse Mixtape Team</p>
+        } ${checkoutSession.shipping.address.postal_code}<br>
+                      ${checkoutSession.shipping.address.country}
+                    </p>
+                  </div>
+                  
+                  <p>We'll send you another email when your order ships!</p>
+                </div>
+                
+                <div class="footer">
+                  <p>Multiverse Mixtape | Los Angeles, CA</p>
+                  <p>Questions? Reply to this email - we're here to help!</p>
+                </div>
+              </div>
+            </body>
+          </html>
         `,
       });
 
@@ -97,6 +143,5 @@ export const POST = async (request) => {
   }
 };
 
-// New Next.js 14.2+ way to disable body parsing
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
