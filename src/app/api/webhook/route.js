@@ -1,4 +1,3 @@
-// src/app/api/webhook/route.js
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import Stripe from "stripe";
@@ -14,7 +13,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export async function POST(request) {
+export const POST = async (request) => {
   try {
     const body = await request.text();
     const signature = request.headers.get("stripe-signature");
@@ -96,10 +95,8 @@ export async function POST(request) {
       { status: 400 }
     );
   }
-}
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
 };
+
+// New Next.js 14.2+ way to disable body parsing
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
