@@ -68,7 +68,7 @@ export default function Cart() {
           Your cart is empty
         </h2>
         <p className="text-gray-600 mb-4">
-          Looks like you haven't added any items yet.
+          Looks like you haven`&apos;`t added any items yet.
         </p>
         <Link
           href="/shop"
