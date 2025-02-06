@@ -1,56 +1,27 @@
-// src/app/success/page.js
-"use client";
-
-import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { CheckCircle, Package, Mail } from "lucide-react";
 import Link from "next/link";
 
-export default function SuccessPage() {
-  const [orderData, setOrderData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const searchParams = useSearchParams();
-  const sessionId = searchParams.get("session_id");
-
-  useEffect(() => {
-    const fetchOrderDetails = async () => {
-      try {
-        const response = await fetch(
-          `/api/checkout/session?session_id=${sessionId}`
-        );
-        if (!response.ok) throw new Error("Failed to fetch order details");
-        const data = await response.json();
-        setOrderData(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (sessionId) {
-      fetchOrderDetails();
-    }
-  }, [sessionId]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading order details...</div>
-      </div>
+async function getOrderData(sessionId) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_URL}/api/checkout/session?session_id=${sessionId}`,
+      { cache: "no-store" } // Ensures fresh data on every request
     );
-  }
 
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-red-600">Error: {error}</div>
-      </div>
-    );
-  }
+    if (!response.ok) throw new Error("Failed to fetch order details");
 
-  if (!orderData) {
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching order data:", error.message);
+    return null;
+  }
+}
+
+export default async function SuccessPage({ searchParams }) {
+  const sessionId = searchParams?.session_id;
+  const orderData = sessionId ? await getOrderData(sessionId) : null;
+
+  if (!sessionId || !orderData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">No order data found</div>
@@ -67,8 +38,8 @@ export default function SuccessPage() {
             Order Confirmed!
           </h1>
           <p className="text-gray-600">
-            Thank you for your purchase. We&apos;ll send you shipping updates via
-            email.
+            Thank you for your purchase. We&apos;ll send you shipping updates
+            via email.
           </p>
         </div>
 
@@ -130,3 +101,6 @@ export default function SuccessPage() {
     </div>
   );
 }
+
+export const runtime = "nodejs"; // Ensures it runs on the server
+export const dynamic = "force-dynamic"; // Forces dynamic rendering
