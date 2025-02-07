@@ -106,12 +106,12 @@ export default async function SuccessPage({ searchParams }) {
         </div>
 
         <div className="text-center">
-          <Link
+          {/* <Link
             href="/shop"
             className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
           >
             Continue Shopping
-          </Link>
+          </Link> */}
         </div>
       </div>
     </div>

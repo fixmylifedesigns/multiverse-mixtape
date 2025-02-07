@@ -22,6 +22,10 @@ export const metadata = {
     default: "MultiverseMixtape | New Wave Music Culture",
     template: "%s | MultiverseMixtape",
   },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+  },
   description:
     "Explore the MultiverseMixtape collection inspired by New Wave and City Pop culture. Shop our curated selection of music-inspired fashion and merchandise.",
   keywords: [

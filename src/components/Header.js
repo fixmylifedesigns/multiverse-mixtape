@@ -54,12 +54,12 @@ export default function Header() {
         >
           Playlist
         </Link>
-          <Link
+          {/* <Link
             href="/shop"
             className="block text-white py-2 px-4 hover:bg-secondary-color rounded"
           >
             Shop
-          </Link>
+          </Link> */}
       </nav>
     </header>
   );
