@@ -20,7 +20,7 @@ const geistMono = localFont({
 export const metadata = {
   metadataBase: new URL("https://multiversemixtape.com"),
   title: {
-    default: "MultiverseMixtape | New Wave Music Culture",
+    default: "MultiverseMixtape | New Wave Music Culture & Fashion",
     template: "%s | MultiverseMixtape",
   },
   icons: {
@@ -28,13 +28,51 @@ export const metadata = {
     shortcut: "/favicon.ico",
   },
   description:
-    "Explore the MultiverseMixtape collection inspired by New Wave and City Pop culture. Shop our curated selection of music-inspired fashion and merchandise.",
+    "Explore music-inspired fashion, vintage aesthetics, and unique posters influenced by New Wave, City Pop, and Japanese culture. Shop exclusive clothing, t-shirts, and collectibles.",
   keywords: [
+    // Core Music & Fashion Keywords
     "new wave",
     "city pop",
-    "music fashion",
+    "synthwave fashion",
+    "vaporwave fashion",
     "retro clothing",
-    "japanese culture",
+    "music-inspired posters",
+    "music-inspired clothing",
+    "Japanese streetwear",
+    "Japanese fashion",
+    "Harajuku style",
+    "Y2K aesthetic",
+    "vintage music shirts",
+    "retro-futurism",
+    "80s fashion",
+    "indie fashion",
+    "underground music fashion",
+    "music culture",
+    "Japanese aesthetic",
+
+    // Clothing & Merchandise
+    "streetwear",
+    "graphic tees",
+    "aesthetic posters",
+    "album cover art",
+    "merchandise",
+    "limited edition clothing",
+    "minimalist fashion",
+    "design t-shirts",
+    "collectible posters",
+
+    // AI & Digital Art (SEO Boost Without Overemphasis)
+    "AI music",
+    "AI fashion",
+    "AI clothing",
+    "AI posters",
+    "AI art",
+    "AI-generated designs",
+    "digital art fashion",
+    "AI-assisted design",
+    "algorithmic artwork",
+
+    // Brand & Niche
     "Multiverse Mixtape",
     "fixmylifenyc",
     "fixmylifeco",
@@ -45,14 +83,25 @@ export const metadata = {
     "Spring Time",
     "Kiko Nakayama",
     "Found Love In Your Eyes",
+    "Ai City Pop",
+    "Ai Music",
   ],
   openGraph: {
-    title: "MultiverseMixtape",
-    description: "New Wave Music Culture & Fashion",
+    title: "MultiverseMixtape | New Wave Culture & Fashion",
+    description:
+      "Discover music-inspired fashion, posters, and collectibles influenced by New Wave, City Pop, and Japanese aesthetics.",
     url: "https://multiversemixtape.com",
     siteName: "MultiverseMixtape",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "https://multiversemixtape.com/beautifuldays.jpg", // Ensure this exists
+        width: 1200,
+        height: 630,
+        alt: "MultiverseMixtape - New Wave Culture & Fashion",
+      },
+    ],
   },
   robots: {
     index: true,
@@ -67,8 +116,10 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "MultiverseMixtape",
-    description: "New Wave Music Culture & Fashion",
+    title: "MultiverseMixtape | Music Culture & Fashion",
+    description:
+      "Explore music-inspired fashion, retro aesthetics, and unique posters influenced by New Wave & Japanese culture.",
+    images: ["https://multiversemixtape.com/og-image.jpg"], // Ensure this exists
   },
 };
 
