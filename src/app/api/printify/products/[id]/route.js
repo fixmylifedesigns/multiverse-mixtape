@@ -1,15 +1,40 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
+
+const DISABLE_CACHE = process.env.DISABLE_PRODUCTS_CACHE === "true";
+const CACHE_TAG = "printify-product-detail";
 
 export async function GET(request, { params }) {
   const { id } = params;
 
   try {
+    // Clear cache if DISABLE_CACHE is true
+    if (DISABLE_CACHE) {
+      try {
+        revalidateTag(CACHE_TAG);
+      } catch (error) {
+        // Ignore errors if no cache exists
+        console.log("No cache to clear or cache already cleared");
+      }
+    }
+
     const response = await fetch(
       `https://api.printify.com/v1/shops/${process.env.PRINTIFY_SHOP_ID}/products/${id}.json`,
       {
         headers: {
           Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`,
         },
+        // Add cache configuration based on DISABLE_CACHE
+        ...(DISABLE_CACHE
+          ? {
+              cache: "no-store",
+            }
+          : {
+              next: {
+                tags: [CACHE_TAG],
+                revalidate: 3600, // Cache for 1 hour
+              },
+            }),
       }
     );
 

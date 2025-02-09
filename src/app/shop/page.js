@@ -2,18 +2,28 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+
+const ITEMS_PER_PAGE = 6;
 
 export default function Shop() {
   const [products, setProducts] = useState([]);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get("page")) || 1;
 
   useEffect(() => {
     async function fetchProducts() {
       try {
         const response = await fetch("/api/printify/products");
         const data = await response.json();
-        setProducts(data);
+        // Filter visible products
+        const visibleProducts = data.filter(
+          (product) => product.visible === true
+        );
+        setProducts(visibleProducts);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -21,8 +31,30 @@ export default function Shop() {
     fetchProducts();
   }, []);
 
+  // Calculate pagination
+  const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const currentProducts = products.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  );
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      <nav aria-label="Breadcrumb" className="mb-8">
+        <ol className="flex items-center space-x-2 text-sm">
+          <li>
+            <Link href="/" className="text-gray-500 hover:text-gray-700">
+              Home
+            </Link>
+          </li>
+
+          <li className="text-gray-500">/</li>
+          <li className="text-gray-900 font-medium" aria-current="page">
+            Shop
+          </li>
+        </ol>
+      </nav>
       <h1 className="text-4xl font-bold mb-4 text-center">
         Shop City Pop Threads
       </h1>
@@ -31,8 +63,8 @@ export default function Shop() {
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {products.length > 0 ? (
-          products.map((product) => (
+        {currentProducts.length > 0 ? (
+          currentProducts.map((product) => (
             <div
               key={product.id}
               className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:-translate-y-2 cursor-pointer"
@@ -72,6 +104,43 @@ export default function Shop() {
           </p>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center mt-8 gap-2">
+          <button
+            onClick={() => router.push(`/shop?page=${currentPage - 1}`)}
+            disabled={currentPage === 1}
+            className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+
+          <div className="flex gap-1">
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i + 1}
+                onClick={() => router.push(`/shop?page=${i + 1}`)}
+                className={`px-3 py-1 rounded-lg ${
+                  currentPage === i + 1
+                    ? "bg-blue-600 text-white"
+                    : "hover:bg-gray-100"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+
+          <button
+            onClick={() => router.push(`/shop?page=${currentPage + 1}`)}
+            disabled={currentPage === totalPages}
+            className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

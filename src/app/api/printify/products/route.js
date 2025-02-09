@@ -1,10 +1,37 @@
+// src/app/api/printify/products/route.js
 import { NextResponse } from "next/server";
+import { revalidateTag } from 'next/cache';
 
 const PRINTIFY_API_KEY = process.env.PRINTIFY_API_KEY;
 const SHOP_ID = process.env.PRINTIFY_SHOP_ID;
+const DISABLE_CACHE = process.env.DISABLE_PRODUCTS_CACHE === 'true';
+const CACHE_TAG = 'printify-products';
+
+function isProductPublished(product) {
+  return (
+    // Check if product is marked as visible (published)
+    product.visible === true && 
+    // Has at least one image
+    product.images.length > 0 &&
+    // Has at least one enabled and available variant
+    product.variants.some(variant => 
+      variant.is_enabled && 
+      variant.is_available && 
+      variant.quantity > 0
+    )
+  );
+}
 
 export async function GET() {
   try {
+    if (DISABLE_CACHE) {
+      try {
+        revalidateTag(CACHE_TAG);
+      } catch (error) {
+        console.log('No cache to clear or cache already cleared');
+      }
+    }
+
     const response = await fetch(
       `https://api.printify.com/v1/shops/${SHOP_ID}/products.json`,
       {
@@ -12,6 +39,14 @@ export async function GET() {
           Authorization: `Bearer ${PRINTIFY_API_KEY}`,
           "Content-Type": "application/json",
         },
+        ...(DISABLE_CACHE ? {
+          cache: 'no-store'
+        } : {
+          next: { 
+            tags: [CACHE_TAG],
+            revalidate: 3600
+          }
+        })
       }
     );
 
@@ -21,11 +56,17 @@ export async function GET() {
 
     const data = await response.json();
 
-    // Clean and filter products
-    const cleanedProducts = data.data.map((product) => {
-      // Get enabled variants and clean them
+    // First filter for published products
+    const publishedProducts = data.data.filter(isProductPublished);
+
+    // Then clean and process the published products
+    const cleanedProducts = publishedProducts.map((product) => {
       const enabledVariants = product.variants
-        .filter((variant) => variant.is_enabled)
+        .filter((variant) => 
+          variant.is_enabled && 
+          variant.is_available && 
+          variant.quantity > 0
+        )
         .map((variant) => ({
           id: variant.id,
           sku: variant.sku,
@@ -39,7 +80,6 @@ export async function GET() {
           quantity: variant.quantity,
         }));
 
-      // Collect used option IDs from enabled variants
       const usedOptionIds = new Set();
       enabledVariants.forEach((variant) => {
         variant.options.forEach((optionId) => {
@@ -47,7 +87,6 @@ export async function GET() {
         });
       });
 
-      // Filter and clean options
       const filteredOptions = product.options.map((option) => ({
         name: option.name,
         type: option.type,
@@ -60,7 +99,6 @@ export async function GET() {
           })),
       }));
 
-      // Return cleaned product
       return {
         id: product.id,
         title: product.title,
@@ -78,12 +116,12 @@ export async function GET() {
       };
     });
 
-    // Filter out products with no enabled variants
-    const productsWithEnabledVariants = cleanedProducts.filter(
+    // Filter one more time for products that still have variants after cleaning
+    const productsWithVariants = cleanedProducts.filter(
       (product) => product.variants.length > 0
     );
 
-    return NextResponse.json(productsWithEnabledVariants);
+    return NextResponse.json(productsWithVariants);
   } catch (error) {
     console.error("Error fetching products from Printify:", error);
     return NextResponse.json(

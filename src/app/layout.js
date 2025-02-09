@@ -4,6 +4,7 @@ import Script from "next/script";
 import Header from "@/components/Header";
 import { CartProvider } from "@/context/CartContext";
 import Cart from "@/components/Cart";
+import styles from "./page.module.css";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,6 +35,16 @@ export const metadata = {
     "music fashion",
     "retro clothing",
     "japanese culture",
+    "Multiverse Mixtape",
+    "fixmylifenyc",
+    "fixmylifeco",
+    "fixmylife",
+    "fixmylifekyoto",
+    "fixmylifejapan",
+    "Keiko Nishimura",
+    "Spring Time",
+    "Kiko Nakayama",
+    "Found Love In Your Eyes",
   ],
   openGraph: {
     title: "MultiverseMixtape",
@@ -73,6 +84,12 @@ export default function RootLayout({ children }) {
           <Cart />
           {children}
         </CartProvider>
+        <footer className={styles.footer}>
+          <p>
+            &copy; 2024 Multiverse Mixtape. Music and Fashion Inspired by
+            Japanese City Pop.
+          </p>
+        </footer>
       </body>
     </html>
   );

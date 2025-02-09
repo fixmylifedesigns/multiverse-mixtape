@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
+import Link from "next/link";
 
 export default function Home() {
   const router = useRouter();
@@ -88,22 +89,15 @@ export default function Home() {
           <p>
             Elevate your wardrobe with fashion inspired by the sounds and
             aesthetics of 1980s City Pop. Our collection includes graphic tees,
-            retro-inspired jackets, and accessories that capture the neon-lit
-            nostalgia of Tokyo nights.
+            and accessories that capture the neon-lit nostalgia of Tokyo nights.
           </p>
           Shop Coming Soon
-          {/* <p>
-            <a href="#">Visit our shop</a> to explore our latest collection!
-          </p> */}
+          <p>
+            <Link href="/shop">Visit our shop</Link> to explore our latest
+            collection!
+          </p>
         </section>
       </main>
-
-      <footer className={styles.footer}>
-        <p>
-          &copy; 2024 Multiverse Mixtape. Music and Fashion Inspired by Japanese
-          City Pop.
-        </p>
-      </footer>
     </div>
   );
 }

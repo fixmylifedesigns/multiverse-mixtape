@@ -1,43 +1,77 @@
 // src/app/success/page.js
+"use client";
+
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { CheckCircle, Package, Mail } from "lucide-react";
 import Link from "next/link";
-import { headers } from "next/headers";
-import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+export default function SuccessPage() {
+  const [orderData, setOrderData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const searchParams = useSearchParams();
+  const sessionId = searchParams.get("session_id");
 
-async function getOrderData(sessionId) {
-  try {
-    // Retrieve the checkout session directly from Stripe
-    const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ["line_items", "customer", "payment_intent"],
-    });
+  useEffect(() => {
+    const fetchOrderDetails = async () => {
+      try {
+        // Fetch order details from Stripe
+        const response = await fetch(
+          `/api/checkout/session?session_id=${sessionId}`
+        );
+        if (!response.ok) throw new Error("Failed to fetch order details");
+        const data = await response.json();
+        setOrderData(data);
 
-    return {
-      orderNumber: session.payment_intent.id,
-      orderDate: new Date(session.created * 1000).toLocaleDateString(),
-      orderAmount: session.amount_total,
-      customer: {
-        email: session.customer_details.email,
-        name: session.customer_details.name,
-      },
-      items: session.line_items.data.map((item) => ({
-        name: item.description,
-        quantity: item.quantity,
-        price: item.amount_total / 100,
-      })),
+        // Send confirmation email if not already sent
+        const confirmResponse = await fetch("/api/order/confirm", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ sessionId }),
+        });
+
+        if (!confirmResponse.ok) {
+          console.error("Failed to send confirmation email");
+        } else {
+          const confirmData = await confirmResponse.json();
+          if (confirmData.alreadySent) {
+            console.log("Email was already sent for this order");
+          } else {
+            console.log("Email sent successfully");
+          }
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     };
-  } catch (error) {
-    console.error("Error fetching order data:", error);
-    return null;
+
+    if (sessionId) {
+      fetchOrderDetails();
+    }
+  }, [sessionId]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Loading order details...</div>
+      </div>
+    );
   }
-}
 
-export default async function SuccessPage({ searchParams }) {
-  const sessionId = searchParams?.session_id;
-  const orderData = sessionId ? await getOrderData(sessionId) : null;
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-red-600">Error: {error}</div>
+      </div>
+    );
+  }
 
-  if (!sessionId || !orderData) {
+  if (!orderData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">No order data found</div>
@@ -54,8 +88,8 @@ export default async function SuccessPage({ searchParams }) {
             Order Confirmed!
           </h1>
           <p className="text-gray-600">
-            Thank you for your purchase. We&apos;ll send you shipping updates
-            via email.
+            Thank you for your purchase. We've sent you a confirmation email
+            with your order details.
           </p>
         </div>
 
@@ -92,7 +126,7 @@ export default async function SuccessPage({ searchParams }) {
         </div>
 
         <div className="bg-gray-50 p-6 rounded-lg mb-8">
-          <h2 className="text-xl font-semibold mb-4">What&apos;s Next?</h2>
+          <h2 className="text-xl font-semibold mb-4">What's Next?</h2>
           <div className="space-y-4">
             <div className="flex items-center">
               <Mail className="w-6 h-6 text-blue-500 mr-3" />
@@ -100,23 +134,20 @@ export default async function SuccessPage({ searchParams }) {
             </div>
             <div className="flex items-center">
               <Package className="w-6 h-6 text-blue-500 mr-3" />
-              <p>We&apos;ll notify you when your order ships</p>
+              <p>We'll notify you when your order ships</p>
             </div>
           </div>
         </div>
 
         <div className="text-center">
-          {/* <Link
+          <Link
             href="/shop"
             className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors"
           >
             Continue Shopping
-          </Link> */}
+          </Link>
         </div>
       </div>
     </div>
   );
 }
-
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
