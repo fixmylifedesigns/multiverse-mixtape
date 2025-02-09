@@ -87,7 +87,7 @@ function SuccessPage() {
             Order Confirmed!
           </h1>
           <p className="text-gray-600">
-            Thank you for your purchase. We`&apos;`ve sent you a confirmation email
+            Thank you for your purchase. We&apos;ve sent you a confirmation email
             with your order details.
           </p>
         </div>
@@ -125,7 +125,7 @@ function SuccessPage() {
         </div>
 
         <div className="bg-gray-50 p-6 rounded-lg mb-8">
-          <h2 className="text-xl font-semibold mb-4">What`&apos;`s Next?</h2>
+          <h2 className="text-xl font-semibold mb-4">What&apos;s Next?</h2>
           <div className="space-y-4">
             <div className="flex items-center">
               <Mail className="w-6 h-6 text-blue-500 mr-3" />
@@ -133,7 +133,7 @@ function SuccessPage() {
             </div>
             <div className="flex items-center">
               <Package className="w-6 h-6 text-blue-500 mr-3" />
-              <p>We`&apos;`ll notify you when your order ships</p>
+              <p>We&apos;ll notify you when your order ships</p>
             </div>
           </div>
         </div>

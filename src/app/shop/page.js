@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -8,7 +8,7 @@ import Link from "next/link";
 
 const ITEMS_PER_PAGE = 6;
 
-export default function Shop() {
+function ShopContent() {
   const [products, setProducts] = useState([]);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -17,9 +17,10 @@ export default function Shop() {
   useEffect(() => {
     async function fetchProducts() {
       try {
-        const response = await fetch("/api/printify/products");
+        const response = await fetch("/api/printify/products", {
+          cache: "no-store",
+        });
         const data = await response.json();
-        // Filter visible products
         const visibleProducts = data.filter(
           (product) => product.visible === true
         );
@@ -31,7 +32,6 @@ export default function Shop() {
     fetchProducts();
   }, []);
 
-  // Calculate pagination
   const totalPages = Math.ceil(products.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const currentProducts = products.slice(
@@ -48,7 +48,6 @@ export default function Shop() {
               Home
             </Link>
           </li>
-
           <li className="text-gray-500">/</li>
           <li className="text-gray-900 font-medium" aria-current="page">
             Shop
@@ -142,5 +141,16 @@ export default function Shop() {
         </div>
       )}
     </div>
+  );
+}
+
+// **Step 2: Wrap `ShopContent` in a Suspense boundary**
+export default function Shop() {
+  return (
+    <Suspense
+      fallback={<div className="text-lg text-center py-8">Loading shop...</div>}
+    >
+      <ShopContent />
+    </Suspense>
   );
 }
