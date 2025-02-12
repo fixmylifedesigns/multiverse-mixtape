@@ -119,7 +119,7 @@ export const metadata = {
     title: "MultiverseMixtape | Music Culture & Fashion",
     description:
       "Explore music-inspired fashion, retro aesthetics, and unique posters influenced by New Wave & Japanese culture.",
-    images: ["https://multiversemixtape.com/og-image.jpg"], // Ensure this exists
+    images: ["https://multiversemixtape.com/logo.png"], // Ensure this exists
   },
 };
 
