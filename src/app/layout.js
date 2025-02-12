@@ -74,6 +74,9 @@ export const metadata = {
 
     // Brand & Niche
     "Multiverse Mixtape",
+    "MultiverseMixtape",
+    "the Multiverse Mixtape",
+    "TheMultiverseMixtape",
     "fixmylifenyc",
     "fixmylifeco",
     "fixmylife",
