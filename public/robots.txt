@@ -1,4 +1,9 @@
+# *
 User-agent: *
 Allow: /
-Disallow: /api/
+
+# Host
+Host: https://multiversemixtape.com
+
+# Sitemaps
 Sitemap: https://multiversemixtape.com/sitemap.xml
