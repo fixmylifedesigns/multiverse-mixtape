@@ -83,17 +83,19 @@ function processProductData(data) {
     return {
       id: product.id,
       title: product.title,
-      description: product.description,
-      images: product.images.map((image) => ({
-        src: image.src,
-        variant_ids: image.variant_ids,
-        position: image.position,
-      })),
-      options: filteredOptions,
-      variants: enabledVariants,
-      external: product.external,
+      // description: product.description,
+      images: [
+        product.images.map((image) => ({
+          src: image.src,
+          variant_ids: image.variant_ids,
+          position: image.position,
+        }))[0],
+      ],
+      // options: filteredOptions,
+      variants: [enabledVariants[0]],
+      // external: product.external,
       visible: product.visible,
-      blueprint_id: product.blueprint_id,
+      // blueprint_id: product.blueprint_id,
     };
   });
 
