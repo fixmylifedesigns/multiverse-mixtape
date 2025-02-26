@@ -1,199 +1,146 @@
 "use client";
 
-import { createContext, useContext, useReducer, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const CartContext = createContext();
 
-const initialState = {
-  items: [],
-  total: 0,
-};
-
-function cartReducer(state, action) {
-  switch (action.type) {
-    case "ADD_TO_CART": {
-      const existingItemIndex = state.items.findIndex(
-        (item) => item.variantId === action.payload.variantId
-      );
-
-      let newItems;
-      if (existingItemIndex > -1) {
-        newItems = state.items.map((item, index) => {
-          if (index === existingItemIndex) {
-            return { ...item, quantity: item.quantity + 1 };
-          }
-          return item;
-        });
-      } else {
-        newItems = [...state.items, { ...action.payload, quantity: 1 }];
-      }
-
-      return {
-        ...state,
-        items: newItems,
-        total: calculateTotal(newItems),
-      };
-    }
-
-    case "REMOVE_FROM_CART": {
-      const newItems = state.items.filter(
-        (item) => item.variantId !== action.payload
-      );
-      return {
-        ...state,
-        items: newItems,
-        total: calculateTotal(newItems),
-      };
-    }
-
-    case "UPDATE_QUANTITY": {
-      const newItems = state.items
-        .map((item) => {
-          if (item.variantId === action.payload.variantId) {
-            return { ...item, quantity: action.payload.quantity };
-          }
-          return item;
-        })
-        .filter((item) => item.quantity > 0); // Remove items with quantity 0
-
-      return {
-        ...state,
-        items: newItems,
-        total: calculateTotal(newItems),
-      };
-    }
-
-    case "CLEAR_CART":
-      return initialState;
-
-    case "LOAD_CART":
-      return {
-        ...state,
-        items: action.payload,
-        total: calculateTotal(action.payload),
-      };
-
-    default:
-      return state;
-  }
-}
-
-function calculateTotal(items) {
-  return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-}
-
 export function CartProvider({ children }) {
-  const [state, dispatch] = useReducer(cartReducer, initialState);
+  // Initialize items as an empty array to prevent the reduce error
+  const [items, setItems] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
 
-  // Load cart from localStorage on mount
+  // Debug function to log current cart state
+  const logCart = (message, cart) => {
+    console.log(
+      `CART ${message}:`,
+      JSON.stringify(
+        cart.map((item) => ({
+          title: item.title,
+          quantity: item.quantity,
+          uniqueKey: item.uniqueKey,
+        }))
+      )
+    );
+  };
+
+  // Load cart from localStorage on initial render
   useEffect(() => {
-    try {
-      const savedCart = localStorage.getItem("cart");
-      if (savedCart) {
-        const { items } = JSON.parse(savedCart);
-        if (Array.isArray(items)) {
-          dispatch({ type: "LOAD_CART", payload: items });
-        }
+    const savedCart = localStorage.getItem("cart");
+    if (savedCart) {
+      try {
+        const parsedCart = JSON.parse(savedCart);
+        // Make sure we set an array even if the localStorage data is invalid
+        setItems(Array.isArray(parsedCart) ? parsedCart : []);
+      } catch (e) {
+        console.error("Failed to parse cart from localStorage", e);
+        setItems([]); // Reset to empty array on error
       }
-    } catch (error) {
-      console.error("Error loading cart from localStorage:", error);
     }
   }, []);
 
-  // Save cart to localStorage when it changes
+  // Save cart to localStorage whenever it changes
   useEffect(() => {
-    try {
-      localStorage.setItem("cart", JSON.stringify(state));
-    } catch (error) {
-      console.error("Error saving cart to localStorage:", error);
+    if (items.length > 0) {
+      localStorage.setItem("cart", JSON.stringify(items));
+    } else {
+      // Remove the cart item if empty to clean up localStorage
+      localStorage.removeItem("cart");
     }
-  }, [state]);
+  }, [items]);
 
-  const addToCart = (product, variantId, selectedOptions) => {
-    try {
-      const variant = product.variants.find((v) => v.id === variantId);
-      if (!variant) {
-        throw new Error("Variant not found");
-      }
+  // Add item to cart
+  const addToCart = (product, variantId, optionsData) => {
+    // Force single increment by using a non-functional update approach
+    // for the case where an item already exists
 
-      dispatch({
-        type: "ADD_TO_CART",
-        payload: {
-          id: product.id,
-          title: product.title,
-          variantId,
-          price: variant.price,
-          image: product.images[0]?.src,
-          options: selectedOptions,
-          variant: {
-            id: variant.id,
-            sku: variant.sku,
-            price: variant.price,
-            grams: variant.grams,
-            is_enabled: variant.is_enabled,
-            options: variant.options,
-          },
-          blueprint_id: product.blueprint_id,
-          print_provider_id: 99, // This is needed for Printify
-        },
-      });
-    } catch (error) {
-      console.error("Error adding item to cart:", error);
-    }
-  };
+    // First, generate the unique key
+    const variant = product.variants.find((v) => v.id === variantId);
+    if (!variant) return; // Safety check
 
-  const removeFromCart = (variantId) => {
-    dispatch({ type: "REMOVE_FROM_CART", payload: variantId });
-  };
+    const uniqueKey = `${product.id}_${variant.id}`;
 
-  const updateQuantity = (variantId, quantity) => {
-    if (quantity < 0) return;
-    dispatch({ type: "UPDATE_QUANTITY", payload: { variantId, quantity } });
-  };
+    // Check if item already exists
+    const existingItemIndex = items.findIndex(
+      (item) => item.uniqueKey === uniqueKey
+    );
 
-  const clearCart = () => {
-    dispatch({ type: "CLEAR_CART" });
-  };
-
-  const getCartForPrintify = () => {
-    return state.items.map((item) => {
-      // If SKU is available, return SKU-based line item
-      if (item.variant?.sku) {
-        return {
-          sku: item.variant.sku,
-          quantity: item.quantity,
-        };
-      }
-
-      // If print_provider_id and blueprint_id are available, return that format
-      if (item.print_provider_id && item.blueprint_id) {
-        return {
-          print_provider_id: item.print_provider_id,
-          blueprint_id: item.blueprint_id,
-          variant_id: parseInt(item.variantId),
-          quantity: item.quantity,
-        };
-      }
-
-      // Default to product_id and variant_id format
-      return {
-        product_id: item.id,
-        variant_id: parseInt(item.variantId),
-        quantity: item.quantity,
+    if (existingItemIndex >= 0) {
+      // Item already exists - create a new array with updated quantity
+      const updatedItems = [...items];
+      updatedItems[existingItemIndex] = {
+        ...updatedItems[existingItemIndex],
+        quantity: updatedItems[existingItemIndex].quantity + 1,
       };
-    });
+
+      // Set the new array directly
+      setItems(updatedItems);
+    } else {
+      // Item is new - add it to the cart
+      const newItem = {
+        productId: product.id,
+        variantId: variant.id,
+        uniqueKey,
+        title: product.title,
+        price: variant.price,
+        image: product.images[0]?.src,
+        quantity: 1,
+        options: optionsData || {},
+      };
+
+      setItems([...items, newItem]);
+    }
+
+    // Always open the cart when adding items
+    setIsOpen(true);
+  };
+
+  // Remove item from cart - use uniqueKey instead of variantId
+  const removeFromCart = (uniqueKey) => {
+    setItems(items.filter((item) => item.uniqueKey !== uniqueKey));
+  };
+
+  // Update item quantity - use uniqueKey instead of variantId
+  const updateQuantity = (uniqueKey, newQuantity) => {
+    if (newQuantity < 1) {
+      removeFromCart(uniqueKey);
+      return;
+    }
+
+    setItems(
+      items.map((item) =>
+        item.uniqueKey === uniqueKey ? { ...item, quantity: newQuantity } : item
+      )
+    );
+  };
+
+  // Calculate total price with safety check
+  const total = Array.isArray(items)
+    ? items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    : 0;
+
+  // Format cart items for Printify API
+  const getCartForPrintify = () => {
+    // Ensure items is an array before mapping
+    return Array.isArray(items)
+      ? items.map((item) => ({
+          product_id: item.productId,
+          variant_id: item.variantId,
+          quantity: item.quantity,
+        }))
+      : [];
   };
 
   return (
     <CartContext.Provider
       value={{
-        items: state.items,
-        total: state.total,
+        items,
         addToCart,
         removeFromCart,
         updateQuantity,
-        clearCart,
+        total,
         getCartForPrintify,
+        isOpen,
+        setIsOpen,
       }}
     >
       {children}
@@ -202,9 +149,5 @@ export function CartProvider({ children }) {
 }
 
 export function useCart() {
-  const context = useContext(CartContext);
-  if (!context) {
-    throw new Error("useCart must be used within a CartProvider");
-  }
-  return context;
+  return useContext(CartContext);
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShoppingCart, X, Plus, Minus, ArrowLeft } from "lucide-react";
+import { X, Plus, Minus, ArrowLeft } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { loadStripe } from "@stripe/stripe-js";
 import ShippingForm from "./ShippingForm";
@@ -10,13 +10,19 @@ import ShippingForm from "./ShippingForm";
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY);
 
 export default function Cart() {
-  const [isOpen, setIsOpen] = useState(false);
   const [showShippingForm, setShowShippingForm] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
 
-  const { items, total, removeFromCart, updateQuantity, getCartForPrintify } =
-    useCart();
+  const {
+    items,
+    total,
+    removeFromCart,
+    updateQuantity,
+    getCartForPrintify,
+    isOpen,
+    setIsOpen,
+  } = useCart();
 
   const handleShippingSubmit = async (addressData) => {
     try {
@@ -99,29 +105,15 @@ export default function Cart() {
     setError(null);
   };
 
-//   if (!process.env.NEXT_SHOW_SHOP) return null;
+  // Don't render anything if cart is not open
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div className="relative">
-      {/* Cart Toggle Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 right-4 z-50 bg-blue-600 text-white p-2 rounded-full shadow-lg hover:bg-blue-700 transition-colors"
-      >
-        <ShoppingCart className="w-6 h-6" />
-        {items.length > 0 && (
-          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
-            {items.length}
-          </span>
-        )}
-      </button>
-
       {/* Cart Sidebar */}
-      <div
-        className={`fixed top-0 right-0 h-full w-96 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-40 ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
+      <div className="fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-lg z-40 transform transition-transform duration-300 ease-in-out translate-x-0">
         <div className="p-4 h-full flex flex-col">
           {/* Cart Header */}
           <div className="flex justify-between items-center border-b pb-4">
@@ -167,7 +159,7 @@ export default function Cart() {
               <div className="space-y-4">
                 {items.map((item) => (
                   <div
-                    key={item.variantId}
+                    key={item.uniqueKey}
                     className="flex items-center space-x-4 border-b pb-4"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -191,7 +183,7 @@ export default function Cart() {
                       <div className="flex items-center space-x-2 mt-2">
                         <button
                           onClick={() =>
-                            updateQuantity(item.variantId, item.quantity - 1)
+                            updateQuantity(item.uniqueKey, item.quantity - 1)
                           }
                           className="p-1 rounded-full hover:bg-gray-100"
                         >
@@ -200,7 +192,7 @@ export default function Cart() {
                         <span>{item.quantity}</span>
                         <button
                           onClick={() =>
-                            updateQuantity(item.variantId, item.quantity + 1)
+                            updateQuantity(item.uniqueKey, item.quantity + 1)
                           }
                           className="p-1 rounded-full hover:bg-gray-100"
                         >
@@ -209,7 +201,7 @@ export default function Cart() {
                       </div>
                     </div>
                     <button
-                      onClick={() => removeFromCart(item.variantId)}
+                      onClick={() => removeFromCart(item.uniqueKey)}
                       className="text-red-500 hover:text-red-700"
                     >
                       <X className="w-5 h-5" />
@@ -234,18 +226,24 @@ export default function Cart() {
               >
                 Proceed to Checkout
               </button>
+
+              {/* Additional close button at the bottom for easier mobile access */}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="w-full mt-3 py-2 border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50 transition-colors"
+              >
+                Continue Shopping
+              </button>
             </div>
           )}
         </div>
       </div>
 
       {/* Backdrop */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
+      <div
+        className="fixed inset-0 bg-black bg-opacity-50 z-30"
+        onClick={() => setIsOpen(false)}
+      />
     </div>
   );
 }
